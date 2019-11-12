@@ -47,5 +47,5 @@
 #define RGBLIGHT_VAL_STEP 8
 #define RGBLIGHT_SLEEP
 /* If defined, the RGB lighting will be switched off when the host goes to sleep */
-#define RGBLIGHT_SLEEP
+#define RGBLIGHT_SLEEP 1
 #endif

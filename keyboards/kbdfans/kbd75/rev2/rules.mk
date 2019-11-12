@@ -15,7 +15,7 @@ BOOTLOADER = atmel-dfu
 #   comment out to disable the options.
 #
 BOOTMAGIC_ENABLE = yes	# Virtual DIP switch configuration
-MOUSEKEY_ENABLE = yes	# Mouse keys
+MOUSEKEY_ENABLE = no	# Mouse keys
 EXTRAKEY_ENABLE = yes	# Audio control and System control
 CONSOLE_ENABLE = no	# Console for debug
 COMMAND_ENABLE = no    # Commands for debug and configuration
@@ -24,5 +24,7 @@ NKRO_ENABLE = yes		# USB Nkey Rollover - if this doesn't work, see here: https:/
 BACKLIGHT_ENABLE = yes  # Enable keyboard backlight functionality
 AUDIO_ENABLE = no
 RGBLIGHT_ENABLE = yes
+UNICODE_ENABLE = no
+UNICODEMAP_ENABLE = yes
 
 LAYOUTS = 75_ansi 75_iso
