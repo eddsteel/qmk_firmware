@@ -2,11 +2,11 @@
 
 extern rgblight_config_t rgblight_config;
 
-const uint16_t LT1S = LT(1,KC_SPC);
-const uint16_t KILL = LGUI(LALT(KC_ESC));
-const uint16_t UMLX = UNICODE_MODE_LNX;
-const uint16_t UMOX = UNICODE_MODE_OSX;
-const uint16_t NKRO = MAGIC_TOGGLE_NKRO;
+#define LT1S LT(1,KC_SPC)
+#define KILL LGUI(LALT(KC_ESC))
+#define UMLX UNICODE_MODE_LNX
+#define UMOX UNICODE_MODE_OSX
+#define NKRO MAGIC_TOGGLE_NKRO
 
 // layernames
 enum {
@@ -22,7 +22,44 @@ const uint8_t HUES[] = {12, 132, 220, 96 };
 
 enum custom_keycodes {
     KC_MR = SAFE_RANGE,
+    UC_TG,
+    OS_KC_A,
+    OS_KC_C,
+    OS_KC_F,
+    OS_KC_K,
+    OS_KC_L,
+    OS_KC_R,
+    OS_KC_S,
+    OS_KC_T,
+    OS_KC_V,
+    OS_KC_X,
+    OS_KC_Z
 };
+
+uint16_t toggle_unicode(void) {
+  uint16_t ret = LCAG(KC_L);
+  switch (unicode_config.input_mode) {
+  case UC_OSX:
+  case UC_WIN:
+  case UC_WINC:
+    set_unicode_input_mode(UC_LNX);
+    break;
+  case UC_LNX:
+    set_unicode_input_mode(UC_OSX);
+    ret = LCAG(KC_X);
+    break;
+  }
+
+  return ret;
+}
+
+void os_tap(uint16_t keycode) {
+  if (unicode_config.input_mode == UC_OSX) {
+    tap_code16(LGUI(keycode));
+  } else {
+    tap_code16(LCTL(keycode));
+  }
+}
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
@@ -31,7 +68,44 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         SEND_STRING("Revert and reapply.");
       } else {}
       break;
-
+  case UC_TG:
+    if (record->event.pressed) {
+      tap_code16(toggle_unicode());
+    }
+    break;
+  case OS_KC_A:
+    os_tap(KC_A);
+    break;
+  case OS_KC_C:
+    os_tap(KC_C);
+    break;
+  case OS_KC_F:
+    os_tap(KC_F);
+    break;
+  case OS_KC_V:
+    os_tap(KC_V);
+    break;
+  case OS_KC_X:
+    os_tap(KC_X);
+    break;
+  case OS_KC_L:
+    os_tap(KC_L);
+    break;
+  case OS_KC_K:
+    os_tap(KC_K);
+    break;
+  case OS_KC_R:
+    os_tap(KC_R);
+    break;
+  case OS_KC_S:
+    os_tap(KC_S);
+    break;
+  case OS_KC_T:
+    os_tap(KC_T);
+    break;
+  case OS_KC_Z:
+    os_tap(KC_Z);
+    break;
   }
   return true;
 };
@@ -135,12 +209,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   ),
 
   LAYOUT(
-    KC_SLEP,       KC_F13,        KC_F14,     KC_F15,      KC_F16,     KC_F17,     KC_F18,     KC_F19,     KC_F20,     KC_F21,     KC_F22,      KC_F23,      KC_F24,     KC_INS,       KC_SLCK,         KILL,
+    KC_SLEP,       HYPR(KC_E),    HYPR(KC_F), HYPR(KC_M),  HYPR(KC_X), KC_F17,     KC_F18,     KC_F19,     KC_F20,     KC_F21,     KC_F22,      KC_F23,      KC_F24,     KC_INS,       KC_SLCK,         KILL,
     OSL(2),        RGB_TOG,       RGB_M_P,    RGB_M_B,     RGB_M_SW,   RGB_M_K,    RGB_M_G,    RGB_HUI,    RGB_HUD,    RGB_SAI,    RGB_SAD,     RGB_VAD,     RGB_VAI,    RESET,        RESET,           DEBUG,
-    KC_NO,         HYPR(KC_Q),    HYPR(KC_W), HYPR(KC_E),  HYPR(KC_R), HYPR(KC_T), HYPR(KC_Y), HYPR(KC_U), HYPR(KC_I), HYPR(KC_O), HYPR(KC_P),  RGB_SPD,     RGB_SPI,    EEP_RST,                       KC_BRIU,
-    UMLX,          HYPR(KC_A),    HYPR(KC_S), HYPR(KC_D),  HYPR(KC_F), HYPR(KC_G), HYPR(KC_H), HYPR(KC_J), HYPR(KC_K), HYPR(KC_L), KC_NO,       KC_NO,                                 UMOX,            KC_BRID,
-    KC_MUTE,       KC_NO,         HYPR(KC_Z), HYPR(KC_X),  HYPR(KC_C), HYPR(KC_V), HYPR(KC_B), HYPR(KC_N), HYPR(KC_M), KC_NO,      KC_NO,       KC_NO,       KC_MPLY,                  KC_VOLU,         NKRO,
-    OSL(3),        KC_NO,         KC_NO,                               KC_SLEP,    KC_SLEP,    KC_SLEP,                            KC_NO,       KC_NO,       KC_TRNS,    KC_MRWD,      KC_VOLD,         KC_MFFD
+    KC_NO,         HYPR(KC_Q),    HYPR(KC_W), HYPR(KC_E),  OS_KC_R,    OS_KC_T,    HYPR(KC_Y), HYPR(KC_U), HYPR(KC_I), HYPR(KC_O), HYPR(KC_P),  RGB_SPD,     RGB_SPI,    EEP_RST,                       KC_BRIU,
+    UMLX,          OS_KC_A,       OS_KC_S,    HYPR(KC_D),  OS_KC_F,    HYPR(KC_G), HYPR(KC_H), HYPR(KC_J), OS_KC_K,    OS_KC_L,    KC_NO,       KC_NO,                                 UMOX,            KC_BRID,
+    KC_MUTE,       KC_NO,         OS_KC_Z,    OS_KC_X,     OS_KC_C,    OS_KC_V,    HYPR(KC_B), HYPR(KC_N), HYPR(KC_M), KC_NO,      KC_NO,       KC_NO,       KC_MPLY,                  KC_VOLU,         NKRO,
+    OSL(3),        KC_NO,         KC_NO,                               KC_SLEP,    UC_TG,      KC_SLEP,                            KC_NO,       KC_NO,       KC_TRNS,    KC_MRWD,      KC_VOLD,         KC_MFFD
   ),
 
   LAYOUT(
@@ -161,7 +235,3 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KC_NO,         KC_NO,         KC_NO,                               KC_NO,      KC_NO,      KC_NO,                              KC_NO,       KC_NO,       KC_NO,      KC_NO,        KC_NO,           KC_NO
   )
 };
-
-
-
-
