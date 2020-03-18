@@ -1,4 +1,5 @@
 #include QMK_KEYBOARD_H
+#include "process_unicode_common.h"
 
 extern rgblight_config_t rgblight_config;
 
@@ -18,7 +19,7 @@ enum {
 };
 
 // hues, 1 per layer
-const uint8_t HUES[] = {12, 132, 220, 96 };
+const uint8_t HUES[] = {12, 132, 220, 96};
 
 enum custom_keycodes {
     KC_MR = SAFE_RANGE,
@@ -122,9 +123,9 @@ void keyboard_post_init_user(void) {
 uint32_t layer_state_set_user(uint32_t state) {
   uint8_t n = get_highest_layer(state);
   if (n < NLYRS) {
-    rgblight_sethsv_noeeprom(HUES[n], 165, 255);
+    rgblight_sethsv_noeeprom(HUES[n], 225, 255);
   } else {
-    rgblight_sethsv_noeeprom(HUES[_BASE], 165, 255);
+    rgblight_sethsv_noeeprom(HUES[_BASE], 225, 255);
   }
 
   return state;
