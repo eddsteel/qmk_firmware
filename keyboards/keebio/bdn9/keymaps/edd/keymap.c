@@ -18,13 +18,13 @@
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     LAYOUT(
         KC_MUTE,    HYPR(KC_S), HYPR(KC_A),
-        KC_MPRV,    KC_MPLY,    KC_MNXT,
-        HYPR(KC_P), HYPR(KC_M), KC_TRNS
+        KC_F7,      KC_F8,      KC_F9,
+        HYPR(KC_P), HYPR(KC_N), MO(1)
     ),
     LAYOUT(
-        _______,       _______,      _______,
-        HYPR(KC_LEFT), HYPR(KC_SPC), HYPR(KC_RIGHT),
-        _______,       _______,      KC_TRNS
+        KC_MUTE,    _______,    _______,
+        HYPR(KC_E), HYPR(KC_F), HYPR(KC_W),
+        HYPR(KC_X), HYPR(KC_Z), _______
     ),
 };
 

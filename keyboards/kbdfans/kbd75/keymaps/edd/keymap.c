@@ -18,49 +18,10 @@ enum {
       NLYRS
 };
 
-// hues, 1 per layer
-const uint8_t HUES[] = {12, 132, 220, 96};
-
 enum custom_keycodes {
     KC_MR = SAFE_RANGE,
-    UC_TG,
-    OS_KC_A,
-    OS_KC_C,
-    OS_KC_F,
-    OS_KC_K,
-    OS_KC_L,
-    OS_KC_R,
-    OS_KC_S,
-    OS_KC_T,
-    OS_KC_V,
-    OS_KC_X,
-    OS_KC_Z
+    KC_IM,
 };
-
-uint16_t toggle_unicode(void) {
-  uint16_t ret = LCAG(KC_L);
-  switch (unicode_config.input_mode) {
-  case UC_OSX:
-  case UC_WIN:
-  case UC_WINC:
-    set_unicode_input_mode(UC_LNX);
-    break;
-  case UC_LNX:
-    set_unicode_input_mode(UC_OSX);
-    ret = LCAG(KC_X);
-    break;
-  }
-
-  return ret;
-}
-
-void os_tap(uint16_t keycode) {
-  if (unicode_config.input_mode == UC_OSX) {
-    tap_code16(LGUI(keycode));
-  } else {
-    tap_code16(LCTL(keycode));
-  }
-}
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
@@ -69,135 +30,38 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         SEND_STRING("Revert and reapply.");
       } else {}
       break;
-  case UC_TG:
-    if (record->event.pressed) {
-      tap_code16(toggle_unicode());
-    }
-    break;
-  case OS_KC_A:
-    os_tap(KC_A);
-    break;
-  case OS_KC_C:
-    os_tap(KC_C);
-    break;
-  case OS_KC_F:
-    os_tap(KC_F);
-    break;
-  case OS_KC_V:
-    os_tap(KC_V);
-    break;
-  case OS_KC_X:
-    os_tap(KC_X);
-    break;
-  case OS_KC_L:
-    os_tap(KC_L);
-    break;
-  case OS_KC_K:
-    os_tap(KC_K);
-    break;
-  case OS_KC_R:
-    os_tap(KC_R);
-    break;
-  case OS_KC_S:
-    os_tap(KC_S);
-    break;
-  case OS_KC_T:
-    os_tap(KC_T);
-    break;
-  case OS_KC_Z:
-    os_tap(KC_Z);
-    break;
+     case KC_IM:
+       tap_code16(HYPR(KC_SPC));
+       rgblight_set_layer_state(3, rgblight_get_layer_state(0));
   }
   return true;
 };
 
-void matrix_init_user() {
-  set_unicode_input_mode(UC_LNX);
-}
+// light 10-13 red when input method is changed
+const rgblight_segment_t PROGMEM inputmethod_layer[] = RGBLIGHT_LAYER_SEGMENTS({10,4,HSV_RED});
+
+const rgblight_segment_t* const PROGMEM my_rgb_layers[] =
+  RGBLIGHT_LAYERS_LIST(RGBLIGHT_LAYER_SEGMENTS({0,15,12,255,255}),
+                       RGBLIGHT_LAYER_SEGMENTS({0,15,132,255,255}),
+                       RGBLIGHT_LAYER_SEGMENTS({0,15,220,255,255}),
+                       inputmethod_layer
+);
+
 
 void keyboard_post_init_user(void) {
   rgblight_enable_noeeprom();
-  rgblight_sethsv_noeeprom(HUES[_BASE], 225, 255);
+  rgblight_sethsv_noeeprom(12, 225, 255);
+  rgblight_layers = my_rgb_layers;
 }
 
 uint32_t layer_state_set_user(uint32_t state) {
-  uint8_t n = get_highest_layer(state);
-  if (n < NLYRS) {
-    rgblight_sethsv_noeeprom(HUES[n], 225, 255);
-  } else {
-    rgblight_sethsv_noeeprom(HUES[_BASE], 225, 255);
-  }
-
+  rgblight_set_layer_state(0, layer_state_cmp(state, 0));
+  rgblight_set_layer_state(1, layer_state_cmp(state, 1));
+  rgblight_set_layer_state(2, layer_state_cmp(state, 2));
+ 
   return state;
 }
 
-// flags are multiple characters, so leave them out of this
-enum unicode_names {
-  GRIN,
-  LAUGH,
-  HAPPY,
-  SAD,
-  WINK,
-  TONGUE,
-  FPALM,
-  BLANK,
-  BRO,
-  ANGRY,
-  CRY,
-  SOB,
-  PARTY,
-  LQ,
-  RQ,
-  LDQ,
-  RDQ,
-  EN,
-  EM,
-  COOL,
-  SAX,
-  SGLASS,
-  NERD,
-  SNOW,
-  HDS,
-  VDS,
-  INTB,
-  GHOST,
-  HEART,
-  TADA
-};
-// only first 127 can be used with shift.
-
-const uint32_t PROGMEM unicode_map[] = {
-  [GRIN]   = 0x1f600, // 😀
-  [LAUGH]  = 0x1f604, // 😄
-  [HAPPY]  = 0x1f642, // 🙂
-  [SAD]    = 0x1f641, // 🙁
-  [WINK]   = 0x1f609, // 😉
-  [TONGUE] = 0x1f61b, // 😛
-  [FPALM]  = 0x1f926, // 🤦
-  [BLANK]  = 0x1f611, // 😑
-  [BRO]    = 0x1f928, // 🤨
-  [CRY]    = 0x1f622, // 😢
-  [SOB]    = 0x1f62d, // 😭
-  [PARTY]  = 0x1f973, // 🥳
-  [TADA]   = 0x1f389, // 🎉
-  [LQ]     = 0x2018 , // ‘
-  [RQ]     = 0x2019 , // ’
-  [LDQ]    = 0x201c , // “
-  [RDQ]    = 0x201d , // ”
-  [EN]     = 0x2013 , // –
-  [EM]     = 0x2014 , // —
-  [COOL]   = 0x1f60e, // 😎
-  [SAX]    = 0x1f3b7, // 🎷
-  [SGLASS] = 0x1f576, // 🕶
-  [NERD]   = 0x1f913, // 🤓
-  [HDS]    = 0x2026 , // …
-  [VDS]    = 0x22ee , // ⋮
-  [INTB]   = 0x203d , // ‽
-  [SNOW]   = 0x2603 , // ☃
-  [GHOST]  = 0x1f47b, // 👻
-  [HEART]  = 0x2764 , // ❤
-  [ANGRY]  = 0x1f620  // 😠
-};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   LAYOUT(
@@ -212,27 +76,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   LAYOUT(
     KC_SLEP,       HYPR(KC_E),    HYPR(KC_F), HYPR(KC_M),  HYPR(KC_X), KC_F17,     KC_F18,     KC_F19,     KC_F20,     KC_F21,     KC_F22,      KC_F23,      KC_F24,     KC_INS,       KC_SLCK,         KILL,
     OSL(2),        RGB_TOG,       RGB_M_P,    RGB_M_B,     RGB_M_SW,   RGB_M_K,    RGB_M_G,    RGB_HUI,    RGB_HUD,    RGB_SAI,    RGB_SAD,     RGB_VAD,     RGB_VAI,    RESET,        RESET,           DEBUG,
-    KC_NO,         HYPR(KC_Q),    HYPR(KC_W), HYPR(KC_E),  OS_KC_R,    OS_KC_T,    HYPR(KC_Y), HYPR(KC_U), HYPR(KC_I), HYPR(KC_O), HYPR(KC_P),  RGB_SPD,     RGB_SPI,    EEP_RST,                       KC_BRIU,
-    UMLX,          OS_KC_A,       OS_KC_S,    HYPR(KC_D),  OS_KC_F,    HYPR(KC_G), HYPR(KC_H), HYPR(KC_J), OS_KC_K,    OS_KC_L,    KC_NO,       KC_NO,                                 UMOX,            KC_BRID,
-    KC_MUTE,       KC_NO,         OS_KC_Z,    OS_KC_X,     OS_KC_C,    OS_KC_V,    HYPR(KC_B), HYPR(KC_N), HYPR(KC_M), KC_NO,      KC_NO,       KC_NO,       KC_MPLY,                  KC_VOLU,         NKRO,
-    OSL(3),        KC_NO,         KC_NO,                               KC_SLEP,    UC_TG,      KC_SLEP,                            KC_NO,       KC_NO,       KC_TRNS,    KC_MRWD,      KC_VOLD,         KC_MFFD
-  ),
-
-  LAYOUT(
-    KC_TRNS,       KC_NO,         KC_NO,      KC_NO,       KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,       KC_NO,       KC_NO,      KC_NO,        KC_NO,           KC_TRNS,
-    OSL(3),        KC_NO,         KC_NO,      X(HEART),    KC_NO,      KC_NO,   XP(BRO,ANGRY), X(GHOST),XP(NERD,SNOW), X(SAD),     X(HAPPY),    XP(EN,EM),   KC_NO,      KC_NO,        KC_NO,           KC_NO,
-    KC_NO,         KC_NO,         KC_NO,      KC_NO,       KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      X(TONGUE),   XP(LQ,LDQ),  XP(RQ,RDQ), X(BLANK),                      KC_NO,
-    KC_NO,         KC_NO,         KC_NO,   XP(GRIN,LAUGH), X(FPALM),   KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      X(WINK),     XP(CRY,SOB),                           KC_NO,           KC_NO,
-    KC_NO,         KC_TRNS,       KC_NO,      KC_NO,       KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,  XP(PARTY,TADA), XP(HDS,VDS), X(INTB),     KC_NO,                    KC_NO,           KC_NO,
-    KC_NO,         KC_NO,         KC_NO,                               KC_NO,      KC_NO,      KC_NO,                              KC_NO,       KC_NO,       KC_NO,      KC_NO,        KC_NO,           KC_NO
-   ),
-
-  [3] = LAYOUT(
-    KC_TRNS,       KC_NO,         KC_NO,      KC_NO,       KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,       KC_NO,       KC_NO,      KC_NO,        KC_NO,           KC_TRNS,
-    KC_NO,         KC_NO,         KC_NO,      KC_NO,       KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,       KC_NO,       KC_NO,      KC_NO,        KC_NO,           KC_NO,
-    KC_NO,         KC_NO,         KC_NO,      KC_NO,       KC_MR,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,       KC_NO,       KC_NO,      KC_NO,                         KC_NO,
-    KC_NO,         KC_NO,         KC_NO,      KC_NO,       KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,       KC_NO,                                 KC_NO,           KC_NO,
-    KC_NO,         KC_NO,         KC_NO,      KC_NO,       KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,       KC_NO,       KC_NO,                    KC_NO,           KC_NO,
-    KC_NO,         KC_NO,         KC_NO,                               KC_NO,      KC_NO,      KC_NO,                              KC_NO,       KC_NO,       KC_NO,      KC_NO,        KC_NO,           KC_NO
+    KC_NO,         HYPR(KC_Q),    HYPR(KC_W), HYPR(KC_E),  HYPR(KC_R), HYPR(KC_T), HYPR(KC_Y), HYPR(KC_U), HYPR(KC_I), HYPR(KC_O), HYPR(KC_P),  RGB_SPD,     RGB_SPI,    EEP_RST,                       KC_BRIU,
+    UMLX,          HYPR(KC_A),    HYPR(KC_S), HYPR(KC_D),  HYPR(KC_F), HYPR(KC_G), HYPR(KC_H), HYPR(KC_J), HYPR(KC_K), HYPR(KC_L), KC_NO,       KC_NO,                              UMOX,            KC_BRID,
+    KC_MUTE,       KC_NO,         HYPR(KC_Z), HYPR(KC_X),  HYPR(KC_C), HYPR(KC_V), HYPR(KC_B), HYPR(KC_N), HYPR(KC_M), KC_NO,      KC_NO,       KC_NO,       KC_MPLY,                  KC_VOLU,         NKRO,
+    OSL(2),        KC_NO,         KC_NO,                               KC_SLEP,    KC_IM,       KC_SLEP,                            KC_NO,       KC_NO,       KC_TRNS,    KC_MRWD,      KC_VOLD,         KC_MFFD
   )
 };
